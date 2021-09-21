@@ -1,0 +1,21 @@
+.listTitle{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  background-color: #1a487f;
+  padding: 10px;
+  font-size: 1em;
+}
+
+.listContainer{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  z-index: -1;
+}
+
+.listContainer ul{
+  padding: 0px;
+}
