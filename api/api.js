@@ -21,10 +21,10 @@ module.exports = (db) => {
 			const studentsEmails = req.body.students;
 
 			if (!tutorEmail) throw new Error('Tutor missing');
-			if (!h.general.isValidEmail(tutorEmail)) throw new Error('Wrong email format');
+			if (!h.general.isValidEmail(tutorEmail)) throw new Error('Wrong email format for tutor');
 			if (!studentsEmails || studentsEmails.length === 0) throw new Error('Students missing');
 			studentsEmails.forEach((email) => {
-				if (!h.general.isValidEmail(email)) throw new Error('Wrong email format');
+				if (!h.general.isValidEmail(email)) throw new Error('Wrong email format for student');
 			})
 
 			await TutorController.registerStudentsToTutor(tutorEmail, studentsEmails);
@@ -50,7 +50,7 @@ module.exports = (db) => {
 
 			if (!tutorEmails) throw new Error('Tutor missing');
 			tutorEmails.forEach((email) => {
-				if (!h.general.isValidEmail(email)) throw new Error('Wrong email format');
+				if (!h.general.isValidEmail(email)) throw new Error('Wrong email format for tutor');
 			})
 
 			const commonStudentEmails = await TutorController.getCommonStudents(tutorEmails);
@@ -77,15 +77,12 @@ module.exports = (db) => {
 			const notification = req.body.notification;
 
 			if (!tutorEmail) throw new Error('Tutor missing');
-			if (!h.general.isValidEmail(tutorEmail)) throw new Error('Wrong email format');
+			if (!h.general.isValidEmail(tutorEmail)) throw new Error('Wrong email format for tutor');
 
 			const taggedEmails = h.general.extractTaggedEmails(notification);
+			const recipients = await TutorController.retrieveNotificationRecipients(tutorEmail, taggedEmails);
 
-			console.log("Email: " + tutorEmail);
-			console.log("Notification: " + notification);
-			console.log(taggedEmails);
-
-			return h.api.createApiRes(req, res, 200, 'Students registered to tutor successfully');
+			return h.api.createApiRes(req, res, 200, 'Retrieved recipients successfully', {recipients: recipients});
 		} catch (err) {
 			return h.api.createApiRes(req, res, 500, err.message);
 		}

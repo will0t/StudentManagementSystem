@@ -1,6 +1,16 @@
 const GeneralHelper = module.exports;
 
 /**
+ * Reduce arrays to one with common values
+ * @param {Array} items
+ * @returns {{}}
+ */
+GeneralHelper.reduceArrayToCommon = (arrays) => {
+	const reducer = (p, c) => p.filter(e => c.includes(e));
+	return arrays.reduce(reducer);
+};
+
+/**
  * Reduce array to object
  * @param {String} key
  * @param {Array} items

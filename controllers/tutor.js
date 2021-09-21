@@ -1,6 +1,7 @@
 module.exports = (db) => {
 	const { TutorModel, StudentModel, TutorStudentModel } = require('../models')(db);
 	const StudentController = require("./student")(db);
+	const h = require('../helpers')
 
 	let TutorController = {};
 
@@ -30,7 +31,10 @@ module.exports = (db) => {
 	 * @returns {Promise<any>}
 	 */
 	TutorController.getStudentsByEmail = async (email) => {
-		const students = await TutorModel.findAll({ where: { email: email } });
+		const tutor = await TutorModel.findOne({ where: { email: email } });
+		const tutorStudents = await TutorStudentModel.findAll({ where: { tutorId: tutor.tutorId } });
+		const studentIds = tutorStudents.map((tutorStudent) => tutorStudent.studentId);
+		const students = await StudentModel.findAll({ where: { studentId: studentIds }});
 		return students;
 	};
 
@@ -68,35 +72,47 @@ module.exports = (db) => {
 	 */
 	TutorController.getCommonStudents = async (tutorEmails) => {
 		// get registered students for every tutor
-		const tutors = await TutorController.getByEmails(tutorEmails);
 		let promises = [];
-		tutors.forEach((tutor) => {
-			let tutorId = tutor.tutorId;
-			let promise = TutorStudentModel.findAll({
-			  where: {
-			    tutorId: tutorId
-			  }
-			});
-			promises.push(promise);
+		tutorEmails.forEach((tutorEmail) => {
+			promises.push(TutorController.getStudentsByEmail(tutorEmail));
 		})
 
 		// get common student Ids
 		const commonStudentIds = await Promise.all(promises).then((studentsArray) => {
 			let studentIdsArray = [];
-			const reducer = (p, c) => p.filter(e => c.includes(e));
 
 			studentsArray.forEach((students) => {
 				let studentIds = students.map((student) => student.studentId);
 				studentIdsArray.push(studentIds);
 			})
 
-			return studentIdsArray.reduce(reducer);
+			return h.general.reduceArrayToCommon(studentIdsArray);
 		});
 
 		// get common student emails
 		const commonStudentEmails = await StudentController.getEmailsByIds(commonStudentIds);
 
 		return commonStudentEmails;
+	};
+
+	/**
+	 * Get recipient students for notification
+	 * @param {string} tutorEmail
+	 * @param {string[]} studentEmails
+	 * @returns {Promise<any>}
+	 */
+	TutorController.retrieveNotificationRecipients = async (tutorEmail, studentEmails) => {
+		// get registered students
+		const registeredStudents = await TutorController.getStudentsByEmail(tutorEmail);
+		const registeredStudentEmails = registeredStudents.map(student => student.email);
+
+    // merge and remove duplicates
+		let mergedEmails = registeredStudentEmails;
+		studentEmails.forEach(email => {
+			if (!(email in mergedEmails)) mergedEmails.push(email);
+		});
+
+		return mergedEmails;
 	};
 
 	return TutorController;
