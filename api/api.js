@@ -5,7 +5,7 @@ const h = require('../helpers')
 module.exports = (db) => {
 
 	const TutorController = require('../controllers/tutor')(db);
-
+	const StudentController = require('../controllers/student')(db);
 	/**
 	 * @api {post} /api/register
 	 * @apiName RegisterStudentsToTutor
@@ -20,12 +20,17 @@ module.exports = (db) => {
 			const tutorEmail = req.body.tutor;
 			const studentsEmails = req.body.students;
 
+			// check if emails are valid
 			if (!tutorEmail) throw new Error('Tutor missing');
 			if (!h.general.isValidEmail(tutorEmail)) throw new Error('Wrong email format for tutor');
 			if (!studentsEmails || studentsEmails.length === 0) throw new Error('Students missing');
 			studentsEmails.forEach((email) => {
 				if (!h.general.isValidEmail(email)) throw new Error('Wrong email format for student');
 			})
+
+			// check if tutor exists
+			const checkTutor = await TutorController.getByEmail(email);
+			if (checkTutor == null) throw new Error('Tutor does not exist');
 
 			await TutorController.registerStudentsToTutor(tutorEmail, studentsEmails);
 
@@ -46,12 +51,20 @@ module.exports = (db) => {
 	 */
 	router.get('/getcommonsstudents', async (req, res) => {
 		try {
-			const tutorEmails = req.query.tutor;
+			let tutorEmails = req.query.tutor;
+			if (typeof tutorEmails === 'string') tutorEmails = [tutorEmails];
 
+			// check if emails are valid
 			if (!tutorEmails) throw new Error('Tutor missing');
 			tutorEmails.forEach((email) => {
 				if (!h.general.isValidEmail(email)) throw new Error('Wrong email format for tutor');
 			})
+
+			// check if student exists
+			for await (email of tutorEmails) {
+				const checkTutor = await TutorController.getByEmail(email);
+				if (checkTutor == null) throw new Error('Tutor does not exist');
+			}
 
 			const commonStudentEmails = await TutorController.getCommonStudents(tutorEmails);
 
@@ -76,10 +89,17 @@ module.exports = (db) => {
 			const tutorEmail = req.body.tutor;
 			const notification = req.body.notification;
 
+			// check if emails are valid
 			if (!tutorEmail) throw new Error('Tutor missing');
 			if (!h.general.isValidEmail(tutorEmail)) throw new Error('Wrong email format for tutor');
 
+			// check if students exist
 			const taggedEmails = h.general.extractTaggedEmails(notification);
+			for await (email of taggedEmails) {
+				const checkStudent = await StudentController.getByEmail(email);
+				if (checkStudent == null) throw new Error('Student does not exist');
+			}
+
 			const recipients = await TutorController.retrieveNotificationRecipients(tutorEmail, taggedEmails);
 
 			return h.api.createApiRes(req, res, 200, 'Retrieved recipients successfully', {recipients: recipients});

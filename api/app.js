@@ -1,6 +1,7 @@
 'use strict'
 
 const express = require('express')
+const cors = require('cors');
 const app = express()
 
 const bodyParser = require('body-parser')
@@ -16,6 +17,7 @@ const apiLimiter = rateLimit({
 })
 
 module.exports = (db) => {
+  app.use(cors());
   app.use('/public', apiLimiter, express.static('public'));
   app.use('/api', jsonParser, require('./api')(db));
   return app;
