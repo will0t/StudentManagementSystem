@@ -2,6 +2,15 @@ const assert = require('chai').assert;
 const h = require('../../helpers');
 
 describe('Helpers tests', () => {
+	describe('reduceArrayToCommon', () => {
+		it('should return array with common elements', () => {
+			const arrays = [[1,3,5], [3,5], [5]];
+			const result = h.general.reduceArrayToCommon(arrays);
+			assert.isNotNull(result);
+			assert.typeOf(result, 'array');
+			assert.strictEqual(result[0], 5);
+		});
+	});
 
 	describe('isValidEmail', () => {
 		it('should return true for registrations@yourpave.com', () => {

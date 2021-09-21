@@ -46,6 +46,8 @@ module.exports = (db) => {
 	 */
 	TutorController.registerStudentsToTutor = async (tutorEmail, studentEmails) => {
 		const tutor = await TutorController.getByEmail(tutorEmail);
+		if (tutor == null) throw new Error('Tutor does not exist');
+
 		const students = await StudentController.getByEmails(studentEmails);
 
 		// building tutorStudent objects
@@ -71,6 +73,12 @@ module.exports = (db) => {
 	 * @returns {Promise<any>}
 	 */
 	TutorController.getCommonStudents = async (tutorEmails) => {
+		// check if tutors exist
+		for await (email of tutorEmails) {
+			const checkTutor = await TutorController.getByEmail(email);
+			if (checkTutor == null) throw new Error('Tutor does not exist');
+		}
+
 		// get registered students for every tutor
 		let promises = [];
 		tutorEmails.forEach((tutorEmail) => {
@@ -102,14 +110,23 @@ module.exports = (db) => {
 	 * @param {string[]} studentEmails
 	 * @returns {Promise<any>}
 	 */
-	TutorController.retrieveNotificationRecipients = async (tutorEmail, studentEmails) => {
+	TutorController.retrieveNotificationRecipients = async (tutorEmail, notification) => {
+		// extract tagged emails from notification
+		const taggedEmails = h.general.extractTaggedEmails(notification);
+
+		// check if tagged students exist
+		for await (email of taggedEmails) {
+			const checkStudent = await StudentController.getByEmail(email);
+			if (checkStudent == null) throw new Error('Student does not exist');
+		}
+
 		// get registered students
 		const registeredStudents = await TutorController.getStudentsByEmail(tutorEmail);
 		const registeredStudentEmails = registeredStudents.map(student => student.email);
 
     // merge and remove duplicates
 		let mergedEmails = registeredStudentEmails;
-		studentEmails.forEach(email => {
+		taggedEmails.forEach(email => {
 			if (!(email in mergedEmails)) mergedEmails.push(email);
 		});
 
