@@ -90,7 +90,8 @@ module.exports = (db) => {
 		});
 
 		// get common student emails
-		const commonStudentEmails = await StudentController.getEmailsByIds(commonStudentIds);
+		const commonStudents = await StudentController.getByIds(commonStudentIds);
+		const commonStudentEmails = commonStudents.map((student) => student.email);
 
 		return commonStudentEmails;
 	};

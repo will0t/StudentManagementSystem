@@ -1,7 +1,7 @@
 import Form from '../components/Form'
 import List from '../components/List';
-import axios from "axios";
 import React, { useState } from 'react';
+import axios from "axios";
 
 function Home() {
   // state for list
@@ -13,21 +13,21 @@ function Home() {
     {fieldName: "tutor", dynamic: true}
   ];
 
-  const url = "http://localhost:8010/api/getcommonsstudents?";
 
   // on submit, retrieve form data and sends request to API
   const formSubmitHandler = (formData) => {
     event.preventDefault();
+    const url = "http://localhost:8010/api/getcommonsstudents?";
     setListContent([]);
 
     let tutorEmails = formData.tutor;
-    console.log(tutorEmails);
 
     if (tutorEmails === undefined){
       alert("Tutor email cannot be empty.");
       return;
     }
 
+    // forming GET request
     let query = url;
     for (let i = 0; i < tutorEmails.length; i++){
       if (tutorEmails[i] === "") break;
@@ -36,6 +36,7 @@ function Home() {
     }
     query = query.replaceAll('@', '%40');
 
+    // sending GET request
     axios.get(query).then((response) => {
       setListContent(response.data.students);
     }).catch((error) =>
@@ -45,6 +46,9 @@ function Home() {
 
   return (
     <>
+      <div style={{borderBottom: "4px solid #1a487f", padding: "0 10px 10px 10px", marginBottom: "20px", fontSize: "1em"}}>
+        Find Common Students
+      </div>
       <Form fields={fields} formSubmitHandler={formSubmitHandler}/>
       <List listTitle="Common Students" listContent={listContent}/>
     </>

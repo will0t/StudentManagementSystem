@@ -6,7 +6,9 @@ module.exports = {
         { tutorId: 1, studentId: 1, createdAt: new Date(), updatedAt: new Date() },
         { tutorId: 1, studentId: 2, createdAt: new Date(), updatedAt: new Date() },
         { tutorId: 2, studentId: 1, createdAt: new Date(), updatedAt: new Date() },
-        { tutorId: 3, studentId: 2, createdAt: new Date(), updatedAt: new Date() }
+        { tutorId: 3, studentId: 2, createdAt: new Date(), updatedAt: new Date() },
+        { tutorId: 4, studentId: 1, createdAt: new Date(), updatedAt: new Date() },
+        { tutorId: 4, studentId: 2, createdAt: new Date(), updatedAt: new Date() }
     ], {});
   },
 

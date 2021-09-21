@@ -24,14 +24,13 @@ module.exports = (db) => {
 	};
 
 	/**
-	 * Get student emails by Ids
+	 * Get students by Ids
 	 * @param {Array} ids
 	 * @returns {Promise<any>}
 	 */
-	StudentController.getEmailsByIds = async (studentIds) => {
+	StudentController.getByIds = async (studentIds) => {
 		const students = await StudentModel.findAll({ where: { studentId: studentIds } });
-		const studentEmails = students.map((student) => student.email);
-		return studentEmails;
+		return students;
 	};
 
 	return StudentController;

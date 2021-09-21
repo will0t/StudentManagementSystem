@@ -17,6 +17,7 @@ module.exports = (db) => {
 	 */
 	router.post('/register', async (req, res) => {
 		try {
+			// retrieving parameters
 			const tutorEmail = req.body.tutor;
 			const studentsEmails = req.body.students;
 
@@ -51,6 +52,7 @@ module.exports = (db) => {
 	 */
 	router.get('/getcommonsstudents', async (req, res) => {
 		try {
+			// retrieving parameters
 			let tutorEmails = req.query.tutor;
 			if (typeof tutorEmails === 'string') tutorEmails = [tutorEmails];
 
@@ -60,7 +62,7 @@ module.exports = (db) => {
 				if (!h.general.isValidEmail(email)) throw new Error('Wrong email format for tutor');
 			})
 
-			// check if student exists
+			// check if tutors exist
 			for await (email of tutorEmails) {
 				const checkTutor = await TutorController.getByEmail(email);
 				if (checkTutor == null) throw new Error('Tutor does not exist');
@@ -86,6 +88,7 @@ module.exports = (db) => {
 	 */
 	router.post('/retrievenotifications', async (req, res) => {
 		try {
+			// retrieving parameters
 			const tutorEmail = req.body.tutor;
 			const notification = req.body.notification;
 

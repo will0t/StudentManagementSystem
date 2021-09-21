@@ -1,5 +1,4 @@
 import Form from '../components/Form';
-import axios from "axios";
 
 
 function Register() {
@@ -7,8 +6,6 @@ function Register() {
     {fieldName: "tutor", dynamic: false},
     {fieldName: "student", dynamic: true}
   ];
-
-  const url = "http://localhost:8010/api/register";
 
   // on submit, retrieve form data and sends request to API
   const formSubmitHandler = (formData) => {
@@ -27,6 +24,9 @@ function Register() {
 
   return (
     <>
+      <div style={{borderBottom: "4px solid #1a487f", padding: "0 10px 10px 10px", marginBottom: "20px", fontSize: "1em"}}>
+        Register Students
+      </div>
       <Form fields={fields} formSubmitHandler={formSubmitHandler}/>
     </>
   )
