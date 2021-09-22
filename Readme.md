@@ -8,4 +8,5 @@ Run the following commands in sequence to start node application
 Note: this is making use of sqlite instead of MySQL.
 
 To reset database to initial migrations and seeders: `npm run reset`
+
 To run tests: `npm run test`
