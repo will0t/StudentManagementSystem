@@ -49,6 +49,7 @@ module.exports = (db) => {
 		if (tutor == null) throw new Error('Tutor does not exist');
 
 		const students = await StudentController.getByEmails(studentEmails);
+		if (studentEmails.length != students.length) throw new Error('Registering student that does not exist');
 
 		// building tutorStudent objects
 		let tutorStudents = students.map((student) => (
@@ -111,6 +112,10 @@ module.exports = (db) => {
 	 * @returns {Promise<any>}
 	 */
 	TutorController.retrieveNotificationRecipients = async (tutorEmail, notification) => {
+		// check if tutor exists
+		const checkTutor = await TutorController.getByEmail(tutorEmail);
+		if (checkTutor == null) throw new Error('Tutor does not exist');
+
 		// extract tagged emails from notification
 		const taggedEmails = h.general.extractTaggedEmails(notification);
 
