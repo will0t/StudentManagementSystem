@@ -132,7 +132,7 @@ module.exports = (db) => {
     // merge and remove duplicates
 		let mergedEmails = registeredStudentEmails;
 		taggedEmails.forEach(email => {
-			if (!(email in mergedEmails)) mergedEmails.push(email);
+			if (!(mergedEmails.includes(email))) mergedEmails.push(email);
 		});
 
 		return mergedEmails;
