@@ -6,3 +6,6 @@ Run the following commands in sequence to start node application
 4. API docs will be available at `http://localhost:8010/public/docs/api/`
 
 Note: this is making use of sqlite instead of MySQL.
+
+To reset database to initial migrations and seeders: `npm run reset`
+To run tests: `npm run test`
